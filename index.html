@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Personal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #f13579;
+    --text: #e8e8e8;
+    --muted: #666;
+    --success: #35f1a0;
+    --warning: #f1a035;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* AUTH SCREEN */
+  #auth-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .auth-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+    letter-spacing: -2px;
+  }
+
+  .auth-sub {
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-bottom: 3rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .field {
+    margin-bottom: 1rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #0e0e0e;
+    border: none;
+    padding: 0.85rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .auth-error {
+    color: var(--accent2);
+    font-size: 0.75rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  /* APP */
+  #app { display: none; }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .logout-btn:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* NAV TABS */
+  nav {
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    padding: 1rem 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  nav button:hover { color: var(--text); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN */
+  main {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+
+  .section-title span {
+    color: var(--accent);
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar input, .filter-bar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .filter-bar input:focus, .filter-bar select:focus {
+    border-color: var(--accent);
+  }
+
+  .btn-filter {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-filter:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* TABLE */
+  .table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  thead tr {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    color: var(--muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--surface); }
+
+  td {
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  td.accent { color: var(--accent); font-weight: 500; }
+  td.muted { color: var(--muted); }
+
+  /* ACTIONS */
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-edit, .btn-delete {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-edit { color: var(--accent); }
+  .btn-edit:hover { border-color: var(--accent); background: rgba(200,241,53,0.05); }
+
+  .btn-delete { color: var(--accent2); }
+  .btn-delete:hover { border-color: var(--accent2); background: rgba(241,53,121,0.05); }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .pagination-btns { display: flex; gap: 0.5rem; }
+
+  .btn-page {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-page:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-page:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.25rem;
+  }
+
+  .modal-close:hover { color: var(--accent2); }
+
+  .modal-body { padding: 1.5rem; }
+
+  .modal-body .field { margin-bottom: 1rem; }
+
+  .modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-cancel {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.6rem 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel:hover { border-color: var(--text); color: var(--text); }
+
+  .btn-save {
+    background: var(--accent);
+    border: none;
+    color: #0e0e0e;
+    padding: 0.6rem 1.25rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+
+  .btn-save:hover { opacity: 0.85; }
+
+  /* CONFIRM MODAL */
+  .confirm-msg {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .confirm-msg strong { color: var(--accent2); }
+
+  /* LOADING & EMPTY */
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .loading::after {
+    content: '';
+    animation: dots 1.5s infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+  }
+
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+    z-index: 300;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--accent2); color: var(--accent2); }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+
+  .stat-value.red { color: var(--accent2); }
+  .stat-value.green { color: var(--success); }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">SYS://</div>
+    <div class="auth-sub">Dashboard Personal</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="tu@email.com">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="auth-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    </div>
+    <button class="btn-primary" onclick="login()">Entrar</button>
+    <div class="auth-error" id="auth-error">Email o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="logo">SYS://</div>
+    <div class="header-right">
+      <span id="user-email" style="font-size:0.75rem;color:var(--muted)"></span>
+      <button class="logout-btn" onclick="logout()">Salir</button>
+    </div>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showSection('alimentos')">🍽 Alimentos</button>
+    <button onclick="showSection('entrenamientos')">💪 Entrenamientos</button>
+    <button onclick="showSection('gastos')">💸 Gastos</button>
+  </nav>
+
+  <main>
+
+    <!-- ALIMENTOS -->
+    <div class="section active" id="section-alimentos">
+      <div class="section-header">
+        <div class="section-title">Ali<span>mentos</span></div>
+      </div>
+      <div class="stats-row" id="stats-alimentos"></div>
+      <div class="filter-bar">
+        <input type="date" id="filter-alimentos-desde" placeholder="Desde">
+        <input type="date" id="filter-alimentos-hasta" placeholder="Hasta">
+        <input type="text" id="filter-alimentos-nombre" placeholder="Buscar alimento...">
+        <button class="btn-filter" onclick="loadAlimentos()">Filtrar</button>
+        <button class="btn-filter" onclick="clearFilters('alimentos')">Limpiar</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Nombre</th>
+              <th>Cantidad</th>
+              <th>Calorías</th>
+              <th>Proteína</th>
+              <th>Carbs</th>
+              <th>Grasa</th>
+              <th>Tipo</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-alimentos"><tr><td colspan="9" class="loading">Cargando</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span id="pagination-info-alimentos"></span>
+        <div class="pagination-btns">
+          <button class="btn-page" id="btn-prev-alimentos" onclick="changePage('alimentos',-1)" disabled>← Prev</button>
+          <button class="btn-page" id="btn-next-alimentos" onclick="changePage('alimentos',1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRENAMIENTOS -->
+    <div class="section" id="section-entrenamientos">
+      <div class="section-header">
+        <div class="section-title">Entre<span>namientos</span></div>
+      </div>
+      <div class="filter-bar">
+        <input type="date" id="filter-ent-desde">
+        <input type="date" id="filter-ent-hasta">
+        <input type="text" id="filter-ent-ejercicio" placeholder="Buscar ejercicio...">
+        <button class="btn-filter" onclick="loadEntrenamientos()">Filtrar</button>
+        <button class="btn-filter" onclick="clearFilters('entrenamientos')">Limpiar</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Ejercicio</th>
+              <th>Serie</th>
+              <th>Reps</th>
+              <th>Peso</th>
+              <th>Dificultad</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-entrenamientos"><tr><td colspan="7" class="loading">Cargando</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span id="pagination-info-entrenamientos"></span>
+        <div class="pagination-btns">
+          <button class="btn-page" id="btn-prev-entrenamientos" onclick="changePage('entrenamientos',-1)" disabled>← Prev</button>
+          <button class="btn-page" id="btn-next-entrenamientos" onclick="changePage('entrenamientos',1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GASTOS -->
+    <div class="section" id="section-gastos">
+      <div class="section-header">
+        <div class="section-title">Gas<span>tos</span></div>
+      </div>
+      <div class="stats-row" id="stats-gastos"></div>
+      <div class="filter-bar">
+        <input type="date" id="filter-gastos-desde">
+        <input type="date" id="filter-gastos-hasta">
+        <input type="text" id="filter-gastos-categoria" placeholder="Categoría...">
+        <button class="btn-filter" onclick="loadGastos()">Filtrar</button>
+        <button class="btn-filter" onclick="clearFilters('gastos')">Limpiar</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Monto</th>
+              <th>Método</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-gastos"><tr><td colspan="6" class="loading">Cargando</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span id="pagination-info-gastos"></span>
+        <div class="pagination-btns">
+          <button class="btn-page" id="btn-prev-gastos" onclick="changePage('gastos',-1)" disabled>← Prev</button>
+          <button class="btn-page" id="btn-next-gastos" onclick="changePage('gastos',1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-edit-title">Editar registro</div>
+      <button class="modal-close" onclick="closeModal('edit')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-edit-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('edit')">Cancelar</button>
+      <button class="btn-save" onclick="saveEdit()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirmar eliminación</div>
+      <button class="modal-close" onclick="closeModal('confirm')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-msg">¿Eliminar este registro? <strong>Esta acción no se puede deshacer.</strong></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('confirm')">Cancelar</button>
+      <button class="btn-save" style="background:var(--accent2)" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── CONFIG ───────────────────────────────────────────────
+  const SUPABASE_URL = 'https://hvhmvstvckirjbypcist.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_kbyoWPGZjjXcBV-iu2ce4w_5f0THicI'; 
+
+  // ─── STATE ────────────────────────────────────────────────
+  let session = null;
+  let currentSection = 'alimentos';
+  let pages = { alimentos: 0, entrenamientos: 0, gastos: 0 };
+  const PAGE_SIZE = 20;
+  let editingRecord = { table: null, id: null };
+  let deletingRecord = { table: null, id: null };
+
+  // ─── AUTH ─────────────────────────────────────────────────
+  async function login() {
+    const email = document.getElementById('auth-email').value;
+    const pass = document.getElementById('auth-pass').value;
+    const err = document.getElementById('auth-error');
+    err.style.display = 'none';
+
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({ email, password: pass })
+    });
+
+    const data = await res.json();
+    if (data.access_token) {
+      session = data;
+      document.getElementById('user-email').textContent = email;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      loadAlimentos();
+    } else {
+      err.style.display = 'block';
+    }
+  }
+
+  function logout() {
+    session = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+
+  // ─── HEADERS ──────────────────────────────────────────────
+  function headers(extra = {}) {
+    return {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${session ? session.access_token : SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...extra
+    };
+  }
+
+  // ─── NAV ──────────────────────────────────────────────────
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`section-${name}`).classList.add('active');
+    event.target.classList.add('active');
+    currentSection = name;
+    if (name === 'alimentos') loadAlimentos();
+    if (name === 'entrenamientos') loadEntrenamientos();
+    if (name === 'gastos') loadGastos();
+  }
+
+  // ─── PAGINATION ───────────────────────────────────────────
+  function changePage(section, dir) {
+    pages[section] = Math.max(0, pages[section] + dir);
+    if (section === 'alimentos') loadAlimentos();
+    if (section === 'entrenamientos') loadEntrenamientos();
+    if (section === 'gastos') loadGastos();
+  }
+
+  function updatePagination(section, count) {
+    const page = pages[section];
+    const total = count;
+    const from = page * PAGE_SIZE + 1;
+    const to = Math.min((page + 1) * PAGE_SIZE, total);
+    document.getElementById(`pagination-info-${section}`).textContent =
+      total > 0 ? `${from}–${to} de ${total}` : '0 registros';
+    document.getElementById(`btn-prev-${section}`).disabled = page === 0;
+    document.getElementById(`btn-next-${section}`).disabled = to >= total;
+  }
+
+  // ─── FILTERS ──────────────────────────────────────────────
+  function clearFilters(section) {
+    if (section === 'alimentos') {
+      document.getElementById('filter-alimentos-desde').value = '';
+      document.getElementById('filter-alimentos-hasta').value = '';
+      document.getElementById('filter-alimentos-nombre').value = '';
+      pages.alimentos = 0;
+      loadAlimentos();
+    }
+    if (section === 'entrenamientos') {
+      document.getElementById('filter-ent-desde').value = '';
+      document.getElementById('filter-ent-hasta').value = '';
+      document.getElementById('filter-ent-ejercicio').value = '';
+      pages.entrenamientos = 0;
+      loadEntrenamientos();
+    }
+    if (section === 'gastos') {
+      document.getElementById('filter-gastos-desde').value = '';
+      document.getElementById('filter-gastos-hasta').value = '';
+      document.getElementById('filter-gastos-categoria').value = '';
+      pages.gastos = 0;
+      loadGastos();
+    }
+  }
+
+  // ─── FORMAT ───────────────────────────────────────────────
+  function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  function fmtNum(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('es-MX');
+  }
+
+  // ─── ALIMENTOS ────────────────────────────────────────────
+  async function loadAlimentos() {
+    const tbody = document.getElementById('tbody-alimentos');
+    tbody.innerHTML = '<tr><td colspan="9" class="loading">Cargando</td></tr>';
+
+    const desde = document.getElementById('filter-alimentos-desde').value;
+    const hasta = document.getElementById('filter-alimentos-hasta').value;
+    const nombre = document.getElementById('filter-alimentos-nombre').value;
+    const page = pages.alimentos;
+
+    let url = `${SUPABASE_URL}/rest/v1/alimentos_consumidos?select=*&order=fecha.desc`;
+    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
+    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (nombre) url += `&nombre=ilike.*${encodeURIComponent(nombre)}*`;
+
+    // Count
+    const countRes = await fetch(url, { headers: { ...headers(), 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const total = parseInt(countRes.headers.get('content-range')?.split('/')[1] || 0);
+
+    // Data
+    const from = page * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    const dataRes = await fetch(url, { headers: { ...headers(), 'Range': `${from}-${to}` } });
+    const data = await dataRes.json();
+
+    updatePagination('alimentos', total);
+
+    // Stats (today)
+    const today = new Date().toISOString().split('T')[0];
+    const statsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/alimentos_consumidos?select=calorias,proteina,carbs,grasa&fecha=gte.${today}T00:00:00&fecha=lte.${today}T23:59:59`,
+      { headers: headers() }
+    );
+    const statsData = await statsRes.json();
+    if (Array.isArray(statsData)) {
+      const sum = (k) => statsData.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+      document.getElementById('stats-alimentos').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Calorías hoy</div><div class="stat-value">${fmtNum(sum('calorias'))}</div></div>
+        <div class="stat-card"><div class="stat-label">Proteína hoy</div><div class="stat-value green">${fmtNum(sum('proteina'))}g</div></div>
+        <div class="stat-card"><div class="stat-label">Carbs hoy</div><div class="stat-value">${fmtNum(sum('carbs'))}g</div></div>
+        <div class="stat-card"><div class="stat-label">Grasa hoy</div><div class="stat-value">${fmtNum(sum('grasa'))}g</div></div>
+      `;
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty">Sin registros</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td class="muted">${fmtDate(r.fecha)}</td>
+        <td class="accent">${r.nombre || '—'}</td>
+        <td>${fmtNum(r.cantidad)}</td>
+        <td>${fmtNum(r.calorias)}</td>
+        <td>${fmtNum(r.proteina)}g</td>
+        <td>${fmtNum(r.carbs)}g</td>
+        <td>${fmtNum(r.grasa)}g</td>
+        <td class="muted">${r.tipo || '—'}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick="openEdit('alimentos_consumidos', ${JSON.stringify(r).replace(/"/g,'&quot;')})">Editar</button>
+            <button class="btn-delete" onclick="openDelete('alimentos_consumidos','${r.id}')">✕</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── ENTRENAMIENTOS ───────────────────────────────────────
+  async function loadEntrenamientos() {
+    const tbody = document.getElementById('tbody-entrenamientos');
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando</td></tr>';
+
+    const desde = document.getElementById('filter-ent-desde').value;
+    const hasta = document.getElementById('filter-ent-hasta').value;
+    const ejercicio = document.getElementById('filter-ent-ejercicio').value;
+    const page = pages.entrenamientos;
+
+    let url = `${SUPABASE_URL}/rest/v1/entrenamientos?select=*&order=fecha.desc`;
+    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
+    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (ejercicio) url += `&ejercicio=ilike.*${encodeURIComponent(ejercicio)}*`;
+
+    const countRes = await fetch(url, { headers: { ...headers(), 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const total = parseInt(countRes.headers.get('content-range')?.split('/')[1] || 0);
+
+    const from = page * PAGE_SIZE;
+    const dataRes = await fetch(url, { headers: { ...headers(), 'Range': `${from}-${from + PAGE_SIZE - 1}` } });
+    const data = await dataRes.json();
+
+    updatePagination('entrenamientos', total);
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin registros</td></tr>';
+      return;
+    }
+
+    const diffColor = { facil: 'var(--success)', medio: 'var(--warning)', dificil: 'var(--accent2)' };
+
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td class="muted">${fmtDate(r.fecha)}</td>
+        <td class="accent">${r.ejercicio || '—'}</td>
+        <td>${r.serie ?? '—'}</td>
+        <td>${r.reps ?? '—'}</td>
+        <td>${r.peso ? fmtNum(r.peso) + ' kg' : '—'}</td>
+        <td style="color:${diffColor[r.dificultad] || 'var(--text)'}">${r.dificultad || '—'}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick="openEdit('entrenamientos', ${JSON.stringify(r).replace(/"/g,'&quot;')})">Editar</button>
+            <button class="btn-delete" onclick="openDelete('entrenamientos','${r.id}')">✕</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── GASTOS ───────────────────────────────────────────────
+  async function loadGastos() {
+    const tbody = document.getElementById('tbody-gastos');
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando</td></tr>';
+
+    const desde = document.getElementById('filter-gastos-desde').value;
+    const hasta = document.getElementById('filter-gastos-hasta').value;
+    const categoria = document.getElementById('filter-gastos-categoria').value;
+    const page = pages.gastos;
+
+    let url = `${SUPABASE_URL}/rest/v1/gastos?select=*&order=fecha.desc`;
+    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
+    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (categoria) url += `&categoria=ilike.*${encodeURIComponent(categoria)}*`;
+
+    const countRes = await fetch(url, { headers: { ...headers(), 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const total = parseInt(countRes.headers.get('content-range')?.split('/')[1] || 0);
+
+    const from = page * PAGE_SIZE;
+    const dataRes = await fetch(url, { headers: { ...headers(), 'Range': `${from}-${from + PAGE_SIZE - 1}` } });
+    const data = await dataRes.json();
+
+    updatePagination('gastos', total);
+
+    // Stats mes actual
+    const now = new Date();
+    const mesDesde = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+    const statsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/gastos?select=monto&fecha=gte.${mesDesde}T00:00:00`,
+      { headers: headers() }
+    );
+    const statsData = await statsRes.json();
+    if (Array.isArray(statsData)) {
+      const total_mes = statsData.reduce((a, r) => a + (Number(r.monto) || 0), 0);
+      document.getElementById('stats-gastos').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Gasto este mes</div><div class="stat-value red">$${fmtNum(total_mes.toFixed(2))}</div></div>
+        <div class="stat-card"><div class="stat-label">Transacciones</div><div class="stat-value">${statsData.length}</div></div>
+      `;
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">Sin registros</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td class="muted">${fmtDate(r.fecha)}</td>
+        <td>${r.descripcion || '—'}</td>
+        <td class="muted">${r.categoria || '—'}</td>
+        <td class="accent">$${fmtNum(Number(r.monto).toFixed(2))}</td>
+        <td class="muted">${r.metodo || '—'}</td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick="openEdit('gastos', ${JSON.stringify(r).replace(/"/g,'&quot;')})">Editar</button>
+            <button class="btn-delete" onclick="openDelete('gastos','${r.id}')">✕</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── EDIT MODAL ───────────────────────────────────────────
+  const FIELDS = {
+    alimentos_consumidos: [
+      { key: 'nombre', label: 'Nombre', type: 'text' },
+      { key: 'cantidad', label: 'Cantidad', type: 'number' },
+      { key: 'calorias', label: 'Calorías', type: 'number' },
+      { key: 'proteina', label: 'Proteína (g)', type: 'number' },
+      { key: 'carbs', label: 'Carbs (g)', type: 'number' },
+      { key: 'grasa', label: 'Grasa (g)', type: 'number' },
+      { key: 'tipo', label: 'Tipo', type: 'text' },
+      { key: 'fecha', label: 'Fecha', type: 'datetime-local' },
+    ],
+    entrenamientos: [
+      { key: 'ejercicio', label: 'Ejercicio', type: 'text' },
+      { key: 'serie', label: 'Serie', type: 'number' },
+      { key: 'reps', label: 'Reps', type: 'number' },
+      { key: 'peso', label: 'Peso (kg)', type: 'number' },
+      { key: 'dificultad', label: 'Dificultad', type: 'text' },
+      { key: 'fecha', label: 'Fecha', type: 'datetime-local' },
+    ],
+    gastos: [
+      { key: 'descripcion', label: 'Descripción', type: 'text' },
+      { key: 'categoria', label: 'Categoría', type: 'text' },
+      { key: 'monto', label: 'Monto', type: 'number' },
+      { key: 'metodo', label: 'Método', type: 'text' },
+      { key: 'fecha', label: 'Fecha', type: 'datetime-local' },
+    ]
+  };
+
+  function openEdit(table, record) {
+    editingRecord = { table, id: record.id };
+    const fields = FIELDS[table];
+    const titles = { alimentos_consumidos: 'Editar Alimento', entrenamientos: 'Editar Entrenamiento', gastos: 'Editar Gasto' };
+    document.getElementById('modal-edit-title').textContent = titles[table];
+    document.getElementById('modal-edit-body').innerHTML = fields.map(f => {
+      let val = record[f.key] ?? '';
+      if (f.type === 'datetime-local' && val) {
+        val = new Date(val).toISOString().slice(0,16);
+      }
+      return `<div class="field">
+        <label>${f.label}</label>
+        <input type="${f.type}" id="edit-${f.key}" value="${val}" step="${f.type==='number'?'any':''}">
+      </div>`;
+    }).join('');
+    document.getElementById('modal-edit').classList.add('open');
+  }
+
+  async function saveEdit() {
+    const { table, id } = editingRecord;
+    const fields = FIELDS[table];
+    const body = {};
+    fields.forEach(f => {
+      const val = document.getElementById(`edit-${f.key}`).value;
+      body[f.key] = f.type === 'number' ? (val === '' ? null : Number(val)) : (val || null);
+    });
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: headers(),
+      body: JSON.stringify(body)
+    });
+
+    closeModal('edit');
+    if (res.ok) {
+      showToast('Registro actualizado', 'success');
+      if (table === 'alimentos_consumidos') loadAlimentos();
+      if (table === 'entrenamientos') loadEntrenamientos();
+      if (table === 'gastos') loadGastos();
+    } else {
+      showToast('Error al guardar', 'error');
+    }
+  }
+
+  // ─── DELETE ───────────────────────────────────────────────
+  function openDelete(table, id) {
+    deletingRecord = { table, id };
+    document.getElementById('modal-confirm').classList.add('open');
+  }
+
+  async function confirmDelete() {
+    const { table, id } = deletingRecord;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: headers()
+    });
+    closeModal('confirm');
+    if (res.ok) {
+      showToast('Registro eliminado', 'success');
+      if (table === 'alimentos_consumidos') loadAlimentos();
+      if (table === 'entrenamientos') loadEntrenamientos();
+      if (table === 'gastos') loadGastos();
+    } else {
+      showToast('Error al eliminar', 'error');
+    }
+  }
+
+  // ─── MODAL ────────────────────────────────────────────────
+  function closeModal(type) {
+    document.getElementById(`modal-${type}`).classList.remove('open');
+  }
+
+  // ─── TOAST ────────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
