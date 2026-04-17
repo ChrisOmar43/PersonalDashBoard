@@ -835,6 +835,13 @@
     }
   }
 
+  // ─── DATE HELPERS ─────────────────────────────────────────
+  function localDateToISO(date, endOfDay = false) {
+    if (!date) return null;
+    const time = endOfDay ? 'T23:59:59.999' : 'T00:00:00';
+    return new Date(date + time).toISOString();
+  }
+
   // ─── FORMAT ───────────────────────────────────────────────
   function fmtDate(d) {
     if (!d) return '—';
@@ -857,8 +864,8 @@
     const page = pages.alimentos;
 
     let url = `${SUPABASE_URL}/rest/v1/alimentos_consumidos?select=*&order=fecha.desc`;
-    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
-    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (desde) url += `&fecha=gte.${localDateToISO(desde)}`;
+    if (hasta) url += `&fecha=lte.${localDateToISO(hasta, true)}`;
     if (nombre) url += `&nombre=ilike.*${encodeURIComponent(nombre)}*`;
 
     // Count
@@ -873,10 +880,11 @@
 
     updatePagination('alimentos', total);
 
-    // Stats (today)
-    const today = new Date().toISOString().split('T')[0];
+    // Stats (today, local)
+    const now = new Date();
+    const todayLocal = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     const statsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/alimentos_consumidos?select=calorias,proteina,carbs,grasa&fecha=gte.${today}T00:00:00&fecha=lte.${today}T23:59:59`,
+      `${SUPABASE_URL}/rest/v1/alimentos_consumidos?select=calorias,proteina,carbs,grasa&fecha=gte.${localDateToISO(todayLocal)}&fecha=lte.${localDateToISO(todayLocal, true)}`,
       { headers: headers() }
     );
     const statsData = await statsRes.json();
@@ -926,8 +934,8 @@
     const page = pages.entrenamientos;
 
     let url = `${SUPABASE_URL}/rest/v1/entrenamientos?select=*&order=fecha.desc`;
-    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
-    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (desde) url += `&fecha=gte.${localDateToISO(desde)}`;
+    if (hasta) url += `&fecha=lte.${localDateToISO(hasta, true)}`;
     if (ejercicio) url += `&ejercicio=ilike.*${encodeURIComponent(ejercicio)}*`;
 
     const countRes = await fetch(url, { headers: { ...headers(), 'Prefer': 'count=exact', 'Range': '0-0' } });
@@ -975,8 +983,8 @@
     const page = pages.gastos;
 
     let url = `${SUPABASE_URL}/rest/v1/gastos?select=*&order=fecha.desc`;
-    if (desde) url += `&fecha=gte.${desde}T00:00:00`;
-    if (hasta) url += `&fecha=lte.${hasta}T23:59:59`;
+    if (desde) url += `&fecha=gte.${localDateToISO(desde)}`;
+    if (hasta) url += `&fecha=lte.${localDateToISO(hasta, true)}`;
     if (categoria) url += `&categoria=ilike.*${encodeURIComponent(categoria)}*`;
 
     const countRes = await fetch(url, { headers: { ...headers(), 'Prefer': 'count=exact', 'Range': '0-0' } });
@@ -988,11 +996,11 @@
 
     updatePagination('gastos', total);
 
-    // Stats mes actual
+    // Stats mes actual (local)
     const now = new Date();
     const mesDesde = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
     const statsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/gastos?select=monto&fecha=gte.${mesDesde}T00:00:00`,
+      `${SUPABASE_URL}/rest/v1/gastos?select=monto&fecha=gte.${localDateToISO(mesDesde)}`,
       { headers: headers() }
     );
     const statsData = await statsRes.json();
